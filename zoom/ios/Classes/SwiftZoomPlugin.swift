@@ -4,7 +4,8 @@ import MobileRTC
 
 public class SwiftZoomPlugin: NSObject, FlutterPlugin,FlutterStreamHandler , MobileRTCMeetingServiceDelegate{
   var authenticationDelegate: AuthenticationDelegate
-  var eventSink: FlutterEventSink? 
+  var eventSink: FlutterEventSink?
+  var minimizeStateSink: FlutterEventSink?
   public static func register(with registrar: FlutterPluginRegistrar) {
     let messenger = registrar.messenger()
     let channel = FlutterMethodChannel(name: "plugins.webcare/zoom_channel", binaryMessenger: messenger)
@@ -13,6 +14,9 @@ public class SwiftZoomPlugin: NSObject, FlutterPlugin,FlutterStreamHandler , Mob
 
     let eventChannel = FlutterEventChannel(name: "plugins.webcare/zoom_event_stream", binaryMessenger: messenger)
     eventChannel.setStreamHandler(instance)
+    
+    let minimizeStateChannel = FlutterEventChannel(name: "plugins.webcare/zoom_minimize_state_stream", binaryMessenger: messenger)
+    minimizeStateChannel.setStreamHandler(instance)
   }
 
   override init(){
@@ -192,7 +196,12 @@ public class SwiftZoomPlugin: NSObject, FlutterPlugin,FlutterStreamHandler , Mob
     }
     
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        self.eventSink = events
+        if let arguments = arguments as? String, arguments == "onMeetingMinimizeStatus" {
+            self.minimizeStateSink = events
+        } else {
+            self.eventSink = events
+        }
+        
         
         let meetingService = MobileRTC.shared().getMeetingService()
         if meetingService == nil {
@@ -204,7 +213,11 @@ public class SwiftZoomPlugin: NSObject, FlutterPlugin,FlutterStreamHandler , Mob
     }
      
     public func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        eventSink = nil
+        if let arguments = arguments as? String, arguments == "onMeetingMinimizeStatus" {
+            minimizeStateSink = nil
+        } else {
+            eventSink = nil
+        }
         return nil
     }
     
@@ -250,6 +263,35 @@ public class SwiftZoomPlugin: NSObject, FlutterPlugin,FlutterStreamHandler , Mob
         }
         
         return message
+    }
+}
+
+extension SwiftZoomPlugin: MobileRTCVideoServiceDelegate {
+    
+    public func onSinkMeetingActiveVideo(_ userID: UInt) {}
+    
+    public func onSinkMeetingVideoStatusChange(_ userID: UInt) {}
+    
+    public func onMyVideoStateChange() {}
+    
+    public func onSinkMeetingVideoStatusChange(_ userID: UInt, videoStatus: MobileRTC_VideoStatus) {}
+    
+    public func onSpotlightVideoChange(_ on: Bool) {}
+    
+    public func onSinkMeetingPreviewStopped() {}
+    
+    public func onSinkMeetingActiveVideo(forDeck userID: UInt) {}
+    
+    public func onSinkMeetingVideoQualityChanged(_ qality: MobileRTCNetworkQuality, userID: UInt) {}
+    
+    public func onSinkMeetingVideoRequestUnmute(byHost completion: @escaping (Bool) -> Void) {}
+    
+    public func onSinkMeetingShowMinimizeMeetingOrBackZoomUI(_ state: MobileRTCMinimizeMeetingState) {
+        guard let minimizeStateSink = minimizeStateSink else {
+            return
+        }
+        
+        minimizeStateSink(state == .showMinimizeMeeting)
     }
 }
 

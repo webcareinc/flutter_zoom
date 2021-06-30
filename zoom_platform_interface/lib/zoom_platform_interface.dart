@@ -37,4 +37,8 @@ abstract class ZoomPlatform extends PlatformInterface {
   Stream<dynamic> onMeetingStatus(){
     throw UnimplementedError('onMeetingStatus() has not been implemented.');
   }
+
+  Stream<dynamic> onMeetingMinimizeStatus(){
+    throw UnimplementedError('onMeetingMinimizeStatus() has not been implemented.');
+  }
 }

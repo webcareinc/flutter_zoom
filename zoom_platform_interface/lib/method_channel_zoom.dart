@@ -8,6 +8,8 @@ class MethodChannelZoom extends ZoomPlatform {
   /// The event channel used to interact with the native platform.
   final EventChannel eventChannel =
       EventChannel('plugins.webcare/zoom_event_stream');
+  final EventChannel minimizeStateChannel =
+      EventChannel('plugins.webcare/zoom_minimize_state_stream');
   @override
   Future<List> initZoom(ZoomOptions options) async {
     assert(options != null);
@@ -80,5 +82,10 @@ class MethodChannelZoom extends ZoomPlatform {
   @override
   Stream<dynamic> onMeetingStatus() {
     return eventChannel.receiveBroadcastStream();
+  }
+  
+  @override
+  Stream<dynamic> onMeetingMinimizeStatus(){
+    return minimizeStateChannel.receiveBroadcastStream("onMeetingMinimizeStatus");
   }
 }

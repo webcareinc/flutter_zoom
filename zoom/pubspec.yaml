@@ -10,8 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zoom_platform_interface: ^1.0.1
-  zoom_web: ^1.0.1  
+  zoom_platform_interface:
+    path: ../zoom_platform_interface
+  zoom_web:
+    path: ../zoom_web
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:zoom_platform_interface/zoom_platform_interface.dart';
+
 export 'package:zoom_platform_interface/zoom_platform_interface.dart'
     show ZoomOptions, ZoomMeetingOptions;
 
@@ -19,4 +20,7 @@ class Zoom {
 
   Stream<dynamic> get onMeetingStateChanged =>
       ZoomPlatform.instance.onMeetingStatus();
+
+  Stream<dynamic> get onMeetingMinimizeStateChanged =>
+      ZoomPlatform.instance.onMeetingMinimizeStatus();
 }

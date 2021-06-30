@@ -13,6 +13,15 @@ class _JoinWidgetState extends State<JoinWidget> {
   TextEditingController meetingIdController = TextEditingController();
   TextEditingController meetingPasswordController = TextEditingController();
   Timer timer;
+
+  @override
+  void initState() {
+    meetingIdController.text = "92133699727";
+    meetingPasswordController.text = "111";
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     // new page needs scaffolding!
@@ -92,7 +101,8 @@ class _JoinWidgetState extends State<JoinWidget> {
       //https://marketplace.zoom.us/docs/sdk/native-sdks/auth
       //https://jwt.io/
       //--todo from server
-      jwtToken: "your jwtToken",
+      jwtToken:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBLZXkiOiJLN0N3R09DOUJhbG5IU2lxVm1kcGhUZUw4aE9RRUhZUGpjUFYiLCJpYXQiOjE2MTU1MTA3OTksImV4cCI6MTY0NzAxNzk5OSwidG9rZW5FeHAiOjE2NDcwMTc5OTl9.qxNdVZpK5PwDDbinyU4A-pYC1eBmTykayZFRNnuiUu0",
     );
     var meetingOptions = new ZoomMeetingOptions(
         userId: 'example',
@@ -111,6 +121,13 @@ class _JoinWidgetState extends State<JoinWidget> {
           print("Meeting Status Stream: " + status[0] + " - " + status[1]);
           if (_isMeetingEnded(status[0])) {
             timer?.cancel();
+          }
+        });
+        zoom.onMeetingMinimizeStateChanged.listen((isMinimize) {
+          if (isMinimize) {
+            print("Meeting is Minimize");
+          } else {
+            print("Meeting is Full Screen");
           }
         });
         zoom.joinMeeting(meetingOptions).then((joinMeetingResult) {
